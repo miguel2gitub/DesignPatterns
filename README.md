@@ -203,14 +203,83 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
 ![factory](./owb/patron_factory_1.png)
 ![factory](./owb/patron_factory_2.png)
 
+Una factoría es un objeto que maneja la creación de otros objetos. Las factorías se utilizan cuando la creación de un objeto implica algo más que una simple instanciación.
+Los siguientes ejemplos son casos donde una factoría puede ayudar:
+  - Es necesario acceder a algún recurso para la creación y configuración de un objeto.
+  - No conocemos hasta el momento preciso de la instanciación qué tipo concreto de objeto se va a instanciar.
+
+En estos casos, en lugar de que sea el propio objeto quien se encargue de todos los aspectos realativos a la creación, se crea otro objeto que lo haga. De esta manera, se libera al objeto que va a ser creado de aquellas responsabilidades que no le corresponden pero que son necesarias para su creación, manteniendo su independencia.
+
+El siguiente es un ejemplo de la utilización de una factoría para la creación de objetos. Se pueden crear figuras geométricas y calcular su área. Las figuras estarían definidas por una interfaz. Las figuras posibles son círculos y cuadrados.
+
+Se va a utilizar una factoría para crear las figuras, puesto que no conocemos de antemano a qué clase pertenece el objetoque tenemos que instanciar. El uso de una factoría permite separar la lógica de negocio, igual para todos los casos, de la lógica de instanciación de los objetos. De este forma el código queda más claro
+
+Ejemplo del patrón de diseño **Factory Method**, que se refiere a la utiliación de un método cuyo propósito principal es la creación de objetos.
+```java
+	public interface Figura {
+	 public double getArea();
+	}
+
+	public class Circulo implements Figura {
+	 double radio;
+	 
+	 public Circulo(double radio) {
+	  this.radio = radio;
+	 }
+	 
+	 public double getArea() {
+	  return (3.14 * radio * radio);
+	 }
+	}
+
+	public class Cuadrado implements Figura {
+	 double lado;
+	 
+	 public Cuadrado(double lado) {
+	  this.lado = lado;
+	 }
+	 
+	 public double getArea() {
+	  return lado * lado;
+	 }
+	}
+
+	public class Principal {
+	 public static void main(String[] args) {
+	  int tipo = Integer.parseInt(args[0]);
+	  double lado = Double.parseDouble(args[0]);  
+	 
+	  Figura figura = 
+	   FiguraFactory.getFigura(tipo, lado);
+
+	  System.out.println("El area de la figura es: " + figura.getArea());
+	 }
+	}
+
+	public class FiguraFactory {
+	 public final static int CUADRADO = 0;
+	 public final static int CIRCULO = 1;
+	 
+	 public static Figura getFigura(int tipo, double lado) {
+	  switch (tipo) {
+	   case CUADRADO:
+	    return new Cuadrado(lado);
+	   case CIRCULO:
+	    return new Circulo(lado);
+	  }  
+	  return null;
+	 }
+	}
+```
+
 ### <a name="abstractfactory">Abstract Factory</a> [![Volver](./owb/flecha_roja_arriba.gif)](#menu)
 - Definicion:
-  - provee un interfaz para crear conjuntos de objetos relacionados o dependientes sin necesidad de especificar sus clases específicas.
+  - provee un interfaz para crear conjuntos de objetos relacionados o dependientes sin necesidad de especificar sus clases específicas o concretas.
 - Uso:
   - Es una evolución del patrón Factory, por tanto se puede aplicar en escenarios similares.
   - Hay varios jerarquías de subclases
   - Puede implementarse utilizando métodos Factory o con Prototype
-- Ejemplo: 
+- Ejemplo: En un juego necesitamos generar distintos tipos de objetos (edificios, armas, personajes), cada uno de los cuales tiene sus variantes por raza/tipo
 ```java
 	public abstract class GameElementFactory {
 	    public GameElementFactory(){}
@@ -305,6 +374,62 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
 ![factory](./owb/patron_abstractFactory_2.png)
 ![factory](./owb/patron_abstractFactory_3.png)
 ![factory](./owb/patron_abstractFactory_4.png)
+- Otro ejemplo: en el que se crea un botón que puede pertenecer a dos familias distintas de componentes gráficos y la aplicación no sabe hasta el momento de la ejecución a qué familia pertenecerá este botón:
+```java
+	interface GUIFactory {
+	 public Button createButton();
+	}
+	 
+	class WinFactory implements GUIFactory {
+	 public Button createButton() {
+	  return new WinButton();
+	 }
+	}
+	 
+	class OSXFactory implements GUIFactory {
+	 public Button createButton() {
+	  return new OSXButton();
+	 }
+	}
+	 
+	interface Button {
+	 public void paint();
+	}
+	 
+	class WinButton implements Button {
+	 public void paint() {
+	  System.out.println("I'm a WinButton");
+	 }
+	}
+	 
+	class OSXButton implements Button {
+	 public void paint() {
+	  System.out.println("I'm an OSXButton");
+	 }
+	}
+	 
+	class Application {
+	 public Application(GUIFactory factory){
+	  Button button = factory.createButton();
+	  button.paint();
+	 }
+	}
+	 
+	public class ApplicationRunner {
+	 public static void main(String[] args) {
+	  new Application(createOsSpecificFactory());
+	 }
+	 
+	 public static GUIFactory createOsSpecificFactory() {
+	  int sys = readFromConfigFile("OS_TYPE");
+	  if (sys == 0) {
+	   return new WinFactory();
+	  } else {
+	   return new OSXFactory();
+	  }
+	 }
+	}
+```
 
 ### <a name="builder">Builder</a> [![Volver](./owb/flecha_roja_arriba.gif)](#menu)
 - Definición:
@@ -314,6 +439,7 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
   - Se precisan múltiples formas de algoritmos de creación.
   - El proceso de construcción debe permitir diferentes representaciones del objeto que se crea
   - Se necesita poder añadir nueva funcionalidad de creación sin que se cambie el código principal
+- Hay quién **confunde** el patrón **Builder** con **Factory**, pero la diferencia es que, mientras el patrón Factory difiere la elección de la clase concreta de un objeto, el patrón Builder simplemente oculta la lógica de creación de un objeto complejo.   
 - Ejemplo, La instancia de un Héroe precisa, además de su creación inicial, dotar de armadura, hechizos y armamento: 
 ```java
 	public class BuilderClient {
@@ -397,6 +523,334 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
 ![factory](./owb/patron_builder_0.png)
 - Ejemplo:
 ![factory](./owb/patron_builder_1.png)
+- Otro ejemplo: tenemos un cocina (Director) que produce pizzas (Producto) de con diferentes características (Concrete Builder):
+```java
+	/** "Product" */
+	class Pizza {
+	 private String dough = "";
+	 private String sauce = "";
+	 private String topping = "";
+	 
+	 public void setDough(String dough) {
+	  this.dough = dough;
+	 }
+	 
+	 public void setSauce(String sauce) {
+	  this.sauce = sauce;
+	 }
+	 
+	 public void setTopping(String topping) {
+	  this.topping = topping;
+	 }
+	}
+	 
+	/** "Abstract Builder" */
+	abstract class PizzaBuilder {
+	 protected Pizza pizza;
+	 
+	 public Pizza getPizza() {
+	  return pizza;
+	 }
+	 
+	 public void createNewPizzaProduct() {
+	  pizza = new Pizza();
+	 }
+	 
+	 public abstract void buildDough();
+	 
+	 public abstract void buildSauce();
+	 
+	 public abstract void buildTopping();
+	}
+
+	/** "ConcreteBuilder" */
+	class HawaiianPizzaBuilder extends PizzaBuilder {
+	 public void buildDough() {
+	  pizza.setDough("cross");
+	 }
+	 
+	 public void buildSauce() {
+	  pizza.setSauce("mild");
+	 }
+	 
+	 public void buildTopping() {
+	  pizza.setTopping("ham+pineapple");
+	 }
+	}
+	 
+	/** "ConcreteBuilder" */
+	class SpicyPizzaBuilder extends PizzaBuilder {
+	 public void buildDough() {
+	  pizza.setDough("pan baked");
+	 }
+	 
+	 public void buildSauce() {
+	  pizza.setSauce("hot");
+	 }
+	 
+	 public void buildTopping() {
+	  pizza.setTopping("pepperoni+salami");
+	 }
+	}
+
+	/** "Director" */
+	class Cook {
+	 private PizzaBuilder pizzaBuilder;
+	  
+	 public void setPizzaBuilder(PizzaBuilder pb) {
+	  pizzaBuilder = pb;
+	 }
+	 
+	 public Pizza getPizza() {
+	  return pizzaBuilder.getPizza();
+	 }
+	 
+	 public void constructPizza() {
+	  pizzaBuilder.createNewPizzaProduct();
+	  pizzaBuilder.buildDough();
+	  pizzaBuilder.buildSauce();
+	  pizzaBuilder.buildTopping();
+	 }
+	}
+	 
+	/** A given type of pizza being constructed. */
+	public class BuilderExample {
+	 public static void main(String[] args) {
+	  Cook cook = new Cook();
+	  
+	  PizzaBuilder hawaiianPizzaBuilder = new HawaiianPizzaBuilder();
+	  PizzaBuilder spicyPizzaBuilder = new SpicyPizzaBuilder();
+	  
+	  cook.setPizzaBuilder(hawaiianPizzaBuilder);
+	  cook.constructPizza();
+	 
+	  Pizza pizza = cook.getPizza();
+	 }
+	}
+```
+
+Mi version del ejemplo -1-
+```java
+
+/**
+  * version adaptada del 2 ejemplo
+  * ObjetoBuilder es parte de Director por:
+  * director.getObjeto() es mas claro que objeto1Builder.getObjeto() en main
+  */
+
+public class MiBuilder1Cliente 
+{
+	public static void main(String[] args) 
+	{
+		Director director = new Director();
+		ObjetoBuilder objeto1Builder = new Objeto1Builder();
+		ObjetoBuilder objeto2Builder = new Objeto2Builder();
+
+		director.setObjetoBuilder(objeto1Builder);
+		director.createObjeto();
+		Objeto objeto1 = director.getObjeto();
+		System.out.println(objeto1);
+
+		director.setObjetoBuilder(objeto2Builder);
+		director.createObjeto();
+		Objeto objeto2 = director.getObjeto();
+		System.out.println(objeto2);
+
+		System.out.println("adios");
+	}
+}
+
+class Director 
+{
+	private ObjetoBuilder objetoBuilder;
+
+	public void setObjetoBuilder(ObjetoBuilder ob) {
+		objetoBuilder = ob;
+	}
+
+	public Objeto getObjeto() {
+		return objetoBuilder.getObjeto();
+	}
+
+	public void createObjeto() {
+		objetoBuilder.createObjeto();
+		objetoBuilder.buildFeature1();
+		objetoBuilder.buildFeature2();
+	}
+}
+
+abstract class ObjetoBuilder 
+{
+	protected Objeto objeto;
+
+	public Objeto getObjeto() {
+		return objeto;
+	}
+
+	public void createObjeto() {
+		objeto = new Objeto();
+	}
+
+	public abstract void buildFeature1();
+	public abstract void buildFeature2();
+}
+
+/** ConcreteBuilder - 1 */
+class Objeto1Builder extends ObjetoBuilder {
+	public void buildFeature1() {
+		objeto.setFeature1("sopa");
+	}
+
+	public void buildFeature2() {
+		objeto.setFeature2("picadillo");
+	}
+}
+
+/** ConcreteBuilder - 2 */
+class Objeto2Builder extends ObjetoBuilder {
+	public void buildFeature1() {
+		objeto.setFeature1("pescado");
+	}
+
+	public void buildFeature2() {
+		objeto.setFeature2("frito");
+	}
+}
+
+/** Objeto */
+class Objeto {
+	private String feature1 = "";
+	private String feature2 = "";
+
+	public void setFeature1(String feature1) {
+		this.feature1 = feature1;
+	}
+
+	public void setFeature2(String feature2) {
+		this.feature2 = feature2;
+	}
+
+    @Override
+    public String toString() {
+        return "Objeto [c1=" + feature1 + ", c2=" + feature2 + "]";
+    }	
+}
+```
+
+Mi version del ejemplo -2-
+```java
+/**
+  * version adaptada del 1 ejemplo
+  * en Director no existe atributo ObjetoBuilder, ni get o set... 
+  * para mi 2 exemplo parece mas claro
+  * director.getObjeto() es mas claro que objeto1Builder.getObjeto() en main
+  */
+
+public class MiBuilder2Cliente 
+{
+	public static void main(String[] args) 
+	{
+		Director director = new Director();
+		ObjetoBuilder objeto1Builder = new Objeto1Builder();
+		ObjetoBuilder objeto2Builder = new Objeto2Builder();
+
+		director.createObjeto(objeto1Builder);
+		Objeto objeto1 = objeto1Builder.getObjeto();
+		System.out.println(objeto1);
+
+		director.createObjeto(objeto2Builder);
+		Objeto objeto2 = objeto2Builder.getObjeto();
+		System.out.println(objeto2);
+
+		System.out.println("adios");
+	}
+}
+
+class Director 
+{
+	public void createObjeto(ObjetoBuilder objetoBuilder) {
+		objetoBuilder.createObjeto();
+		objetoBuilder.buildFeature1();
+		objetoBuilder.buildFeature2();
+	}
+}
+
+abstract class ObjetoBuilder 
+{
+	protected Objeto objeto;
+
+	public abstract void createObjeto();
+	public abstract void buildFeature1();
+	public abstract void buildFeature2();
+
+	public abstract Objeto getObjeto();	
+}
+
+/** ConcreteBuilder - 1 */
+class Objeto1Builder extends ObjetoBuilder {
+
+	@Override
+	public void createObjeto() {
+		this.objeto = new Objeto();
+	}
+
+    @Override
+    public Objeto getObjeto() {
+        return objeto;
+    }
+
+	@Override
+	public void buildFeature1() {
+		objeto.setFeature1("sopa");
+	}
+
+	@Override
+	public void buildFeature2() {
+		objeto.setFeature2("picadillo");
+	}
+}
+
+/** ConcreteBuilder - 2 */
+class Objeto2Builder extends ObjetoBuilder {
+
+	@Override
+	public void createObjeto() {
+		this.objeto = new Objeto();
+	}
+
+    @Override
+    public Objeto getObjeto() {
+        return objeto;
+    }
+
+	public void buildFeature1() {
+		objeto.setFeature1("pescado");
+	}
+
+	public void buildFeature2() {
+		objeto.setFeature2("frito");
+	}
+}
+
+/** Objeto */
+class Objeto {
+	private String feature1 = "";
+	private String feature2 = "";
+
+	public void setFeature1(String feature1) {
+		this.feature1 = feature1;
+	}
+
+	public void setFeature2(String feature2) {
+		this.feature2 = feature2;
+	}
+
+    @Override
+    public String toString() {
+        return "Objeto [c1=" + feature1 + ", c2=" + feature2 + "]";
+    }	
+}
+```
 
 ### <a name="prototype">Prototype</a> [![Volver](./owb/flecha_roja_arriba.gif)](#menu)
 - Definición:
@@ -407,6 +861,9 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
   - Cuando la creación, composición y representación de los objetos debe desacoplarse del sistema
   - La creación inicial de cada objeto es una operación costosa
   - En los objetos existen un número limitado de combinaciones de estados. Por tanto compensa definir unos prototipos y clonarlos, ajustando ese estado posteriormente.
+- desde tratandodeentenderlo.blogspot
+  - Para evitar las subclases de un objeto creador como hace el patrón Abstract Factory.
+  - Para evitar el costo inherente a la creación de un objeto nuevo mediante el operador new cuando esto demasiado costoso para la aplicación.  
 - Ejemplo: En un juego se generan muchos elementos que son muy similares entre si como ovejas, jabalíes o focas. Nos bastaría con clonarlos
 ```java
 	public class PrototypeClient {
@@ -508,6 +965,133 @@ Nos permite garantizar que solamente existe una instancia de una clase, ocultand
 - Ejemplo:
 ![factory](./owb/patron_prototype_1.png)
 ![factory](./owb/patron_prototype_2.png)
+
+Para implementar este patrón, se declara una clase base abstracta que tiene un método clone(). Cualquier clase que necesite un constructor deriva de la clase abstracta e implementa el método clone().
+
+El cliente, en vez de escribir codigo que hace uso del operador new sobre una clase específica, llama al método clone() de la clase prototipo, o llama a un método factoría con un parámetro que especifica la clase deseada, o invoca el método clone() de la clase de alguna otra forma.
+
+```java
+	/** Prototype Class */
+	abstract class PrototypeFactory implements Cloneable {
+	 public PrototypeFactory clone() throws CloneNotSupportedException {
+	 // call Object.clone()
+	 PrototypeFactory copy = (PrototypeFactory) super.clone();
+	 //In an actual implementation of this pattern you might 
+	 //now change references to
+	 //the expensive to produce parts from the copies 
+	 //that are held inside the prototype.
+	 return copy;
+	}
+	 
+	abstract void prototypeFactory(int x);
+	 abstract void printValue();
+	}
+	 
+	/** Concrete Prototypes to clone */
+	class PrototypeImpl extends PrototypeFactory {
+	 int x;
+	 
+	 public PrototypeImpl(int x) {
+	  this.x = x;
+	 }
+	 
+	 @Override
+	 void prototypeFactory(int x) {
+	  this.x = x;
+	 }
+	 
+	 public void printValue() {
+	  System.out.println("Value :" + x);
+	 }
+	}
+	 
+	/** Client Class */
+	public class PrototypeExample {
+	 private PrototypeFactory example; 
+	 // Could have been a private Cloneable example.
+	 
+	 public PrototypeExample(PrototypeFactory example) {
+	  this.example = example;
+	 }
+	 
+	 public PrototypeFactory makeCopy() throws CloneNotSupportedException {
+	  return this.example.clone();
+	 }
+	 
+	 public static void main(String args[]) {
+	  try {
+	   PrototypeFactory tempExample = null;
+	   int num = 1000;
+	   PrototypeFactory prot = new PrototypeImpl(1000);
+	   PrototypeExample cm = new PrototypeExample(prot);
+	   for (int i = 0; i < 10; i++) {
+	    tempExample = cm.makeCopy();
+	    tempExample.prototypeFactory(i * num);
+	    tempExample.printValue();
+	   }
+	  } catch (CloneNotSupportedException e) {
+	   e.printStackTrace();
+	  }
+	 }
+	}
+```
+
+También se puede combinar el uso del patrón Prototype con el de Factory Method
+
+```java
+	// Los productos deben implementar esta interface
+	public interface Producto extends Cloneable {
+	 Object clone();
+	 // Aqui van todas las operaciones comunes a los productos que genera la factoria
+	}
+	 
+	// Un ejemplo basico de producto
+	public class UnProducto implements Producto {
+	 private int atributo;
+	 
+	 UnProducto(int atributo) {
+	  this.atributo = atributo;
+	 }
+	 
+	 public Object clone() {
+	  return new UnProducto(this.atributo);
+	 }
+	 
+	 public String toString() {
+	  return ((Integer)atributo).toString();
+	 }
+	}
+	 
+	// La clase encargada de generar objetos a partir de los prototipos
+	public class FactoriaPrototipo {
+	 private HashMap mapaObjetos;
+	 private String nombrePorDefecto;
+	 
+	 public FactoriaPrototipo() {
+	  mapaObjetos = new HashMap();
+	  // Se incluyen al mapa todos los productos prototipo
+	  mapaObjetos.put("producto 1", new UnProducto(1));
+	 }
+	 
+	 public Object create() {
+	  return create(nombrePorDefecto);
+	 }
+	 
+	 public Object create(String nombre) {
+	  nombrePorDefecto = nombre;
+	  UnProducto objeto = (UnProducto)mapaObjetos.get(nombre);
+	  return objeto != null ? objeto.clone() : null;
+	 }
+	}
+	 
+	public class PruebaFactoria {
+	 static public void main(String[] args) {
+	  FactoriaPrototipo factoria = new FactoriaPrototipo();
+	  Producto producto = (Producto) factoria.create("producto 1");
+	  System.out.println ("Este es el objeto creado: " + producto);
+	 }
+	}
+```
 
 ---
 
