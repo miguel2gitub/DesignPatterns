@@ -631,114 +631,6 @@ Ejemplo del patrón de diseño **Factory Method**, que se refiere a la utiliaci�
 
 Mi version del ejemplo -1-
 ```java
-
-/**
-  * version adaptada del 2 ejemplo
-  * ObjetoBuilder es parte de Director por:
-  * director.getObjeto() es mas claro que objeto1Builder.getObjeto() en main
-  */
-
-public class MiBuilder1Cliente 
-{
-	public static void main(String[] args) 
-	{
-		Director director = new Director();
-		ObjetoBuilder objeto1Builder = new Objeto1Builder();
-		ObjetoBuilder objeto2Builder = new Objeto2Builder();
-
-		director.setObjetoBuilder(objeto1Builder);
-		director.createObjeto();
-		Objeto objeto1 = director.getObjeto();
-		System.out.println(objeto1);
-
-		director.setObjetoBuilder(objeto2Builder);
-		director.createObjeto();
-		Objeto objeto2 = director.getObjeto();
-		System.out.println(objeto2);
-
-		System.out.println("adios");
-	}
-}
-
-class Director 
-{
-	private ObjetoBuilder objetoBuilder;
-
-	public void setObjetoBuilder(ObjetoBuilder ob) {
-		objetoBuilder = ob;
-	}
-
-	public Objeto getObjeto() {
-		return objetoBuilder.getObjeto();
-	}
-
-	public void createObjeto() {
-		objetoBuilder.createObjeto();
-		objetoBuilder.buildFeature1();
-		objetoBuilder.buildFeature2();
-	}
-}
-
-abstract class ObjetoBuilder 
-{
-	protected Objeto objeto;
-
-	public Objeto getObjeto() {
-		return objeto;
-	}
-
-	public void createObjeto() {
-		objeto = new Objeto();
-	}
-
-	public abstract void buildFeature1();
-	public abstract void buildFeature2();
-}
-
-/** ConcreteBuilder - 1 */
-class Objeto1Builder extends ObjetoBuilder {
-	public void buildFeature1() {
-		objeto.setFeature1("sopa");
-	}
-
-	public void buildFeature2() {
-		objeto.setFeature2("picadillo");
-	}
-}
-
-/** ConcreteBuilder - 2 */
-class Objeto2Builder extends ObjetoBuilder {
-	public void buildFeature1() {
-		objeto.setFeature1("pescado");
-	}
-
-	public void buildFeature2() {
-		objeto.setFeature2("frito");
-	}
-}
-
-/** Objeto */
-class Objeto {
-	private String feature1 = "";
-	private String feature2 = "";
-
-	public void setFeature1(String feature1) {
-		this.feature1 = feature1;
-	}
-
-	public void setFeature2(String feature2) {
-		this.feature2 = feature2;
-	}
-
-    @Override
-    public String toString() {
-        return "Objeto [c1=" + feature1 + ", c2=" + feature2 + "]";
-    }	
-}
-```
-
-Mi version del ejemplo -2-
-```java
 /**
   * version adaptada del 1 ejemplo
   * en Director no existe atributo ObjetoBuilder, ni get o set... 
@@ -823,6 +715,113 @@ class Objeto2Builder extends ObjetoBuilder {
         return objeto;
     }
 
+	public void buildFeature1() {
+		objeto.setFeature1("pescado");
+	}
+
+	public void buildFeature2() {
+		objeto.setFeature2("frito");
+	}
+}
+
+/** Objeto */
+class Objeto {
+	private String feature1 = "";
+	private String feature2 = "";
+
+	public void setFeature1(String feature1) {
+		this.feature1 = feature1;
+	}
+
+	public void setFeature2(String feature2) {
+		this.feature2 = feature2;
+	}
+
+    @Override
+    public String toString() {
+        return "Objeto [c1=" + feature1 + ", c2=" + feature2 + "]";
+    }	
+}
+```
+
+Mi version del ejemplo -2-
+```java
+/**
+  * version adaptada del 2 ejemplo
+  * ObjetoBuilder es parte de Director por:
+  * director.getObjeto() es mas claro que objeto1Builder.getObjeto() en main
+  */
+
+public class MiBuilder1Cliente 
+{
+	public static void main(String[] args) 
+	{
+		Director director = new Director();
+		ObjetoBuilder objeto1Builder = new Objeto1Builder();
+		ObjetoBuilder objeto2Builder = new Objeto2Builder();
+
+		director.setObjetoBuilder(objeto1Builder);
+		director.createObjeto();
+		Objeto objeto1 = director.getObjeto();
+		System.out.println(objeto1);
+
+		director.setObjetoBuilder(objeto2Builder);
+		director.createObjeto();
+		Objeto objeto2 = director.getObjeto();
+		System.out.println(objeto2);
+
+		System.out.println("adios");
+	}
+}
+
+class Director 
+{
+	private ObjetoBuilder objetoBuilder;
+
+	public void setObjetoBuilder(ObjetoBuilder ob) {
+		objetoBuilder = ob;
+	}
+
+	public Objeto getObjeto() {
+		return objetoBuilder.getObjeto();
+	}
+
+	public void createObjeto() {
+		objetoBuilder.createObjeto();
+		objetoBuilder.buildFeature1();
+		objetoBuilder.buildFeature2();
+	}
+}
+
+abstract class ObjetoBuilder 
+{
+	protected Objeto objeto;
+
+	public Objeto getObjeto() {
+		return objeto;
+	}
+
+	public void createObjeto() {
+		objeto = new Objeto();
+	}
+
+	public abstract void buildFeature1();
+	public abstract void buildFeature2();
+}
+
+/** ConcreteBuilder - 1 */
+class Objeto1Builder extends ObjetoBuilder {
+	public void buildFeature1() {
+		objeto.setFeature1("sopa");
+	}
+
+	public void buildFeature2() {
+		objeto.setFeature2("picadillo");
+	}
+}
+
+/** ConcreteBuilder - 2 */
+class Objeto2Builder extends ObjetoBuilder {
 	public void buildFeature1() {
 		objeto.setFeature1("pescado");
 	}
