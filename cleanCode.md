@@ -300,4 +300,4 @@ Ver: Ley de Demeter
     - Son mecanismos de entrega
     - Comunican los casos de uso con: la UI, BD, etc...
 
-![arquitectura](.owb/arquitectura.png)    
+![arquitectura](./owb/arquitectura.png)    
